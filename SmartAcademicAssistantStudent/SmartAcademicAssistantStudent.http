@@ -1,0 +1,6 @@
+@SmartAcademicAssistantStudent_HostAddress = http://localhost:5182
+
+GET {{SmartAcademicAssistantStudent_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
