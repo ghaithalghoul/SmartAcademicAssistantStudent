@@ -6,14 +6,15 @@ namespace SmartAcademicAssistantStudent.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public string UniversityId { get; set; }
-        public string Major { get; set; }
-        [Range(0.0, 4.0)]
+        public string UniversityId { get; set; } = string.Empty;
+        public string Major { get; set; } = string.Empty;
         public double GPA { get; set; }
 
-        public User User { get; set; }
-        public ICollection<Enrollment> Enrollments { get; set; }
-        public ICollection<CourseReview> Reviews { get; set; }
+        public User User { get; set; } = null!;
+
+        // ✅ غيّر من ICollection إلى List
+        public List<Enrollment> Enrollments { get; set; } = [];
+        public List<CourseReview> Reviews { get; set; } = [];
 
     }
 }

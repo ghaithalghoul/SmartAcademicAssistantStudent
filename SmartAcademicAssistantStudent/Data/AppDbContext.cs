@@ -14,6 +14,7 @@ namespace SmartAcademicAssistantStudent.Data
         public DbSet<CourseReview> CourseReviews { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
+        public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -150,6 +151,23 @@ namespace SmartAcademicAssistantStudent.Data
                 entity.HasKey(f => f.Id);
                 entity.Property(f => f.Question).IsRequired().HasMaxLength(500);
                 entity.Property(f => f.Answer).IsRequired().HasMaxLength(2000);
+            });
+            modelBuilder.Entity<CoursePrerequisite>(entity =>
+            {
+                entity.HasKey(cp => cp.Id);
+
+                entity.HasOne(cp => cp.Course)
+                      .WithMany(c => c.Prerequisites)
+                      .HasForeignKey(cp => cp.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cp => cp.RequiredCourse)
+                      .WithMany()
+                      .HasForeignKey(cp => cp.RequiredCourseId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // نفس المادة ما تتكرر كـ prerequisite
+                entity.HasIndex(cp => new { cp.CourseId, cp.RequiredCourseId }).IsUnique();
             });
         }
     }
