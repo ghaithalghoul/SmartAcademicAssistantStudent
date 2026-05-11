@@ -17,9 +17,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.ML.EntryPoints" Version="0.23.0" />
+    <PackageReference Include="Microsoft.ML.FastTree" Version="5.0.0" />
     <PackageReference Include="PdfPig" Version="0.1.14" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.14.9" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MLModel\" />
   </ItemGroup>
 
 </Project>

@@ -15,6 +15,7 @@ namespace SmartAcademicAssistantStudent.Data
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
+        public DbSet<CVEvaluation> CVEvaluations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

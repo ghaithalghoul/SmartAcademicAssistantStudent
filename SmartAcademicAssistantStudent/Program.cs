@@ -21,6 +21,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ─── Services ─────────────────────────────────────────────────
 builder.Services.AddScoped<ISmartChatService, SmartChatService>();
 builder.Services.AddScoped<ICourseAdvisorService, CourseAdvisorService>();
+builder.Services.AddSingleton<ICVMLService, CVMLService>();
+builder.Services.AddScoped<ICVExtractorService, CVExtractorService>();
+builder.Services.AddScoped<ICVEvaluationService, CVEvaluationService>();
 
 // ─── JWT Authentication ───────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -45,11 +48,13 @@ builder.Services.AddAuthorization();
 // ─── CORS (اختياري — لو عندك Frontend) ───────────────────────
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3000",
+                            "http://localhost:3001")
+              .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowCredentials();
     });
 });
 
@@ -63,8 +68,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors(); // ← قبل Authentication
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication(); // ← لازم تكون قبل Authorization
 app.UseAuthorization();
