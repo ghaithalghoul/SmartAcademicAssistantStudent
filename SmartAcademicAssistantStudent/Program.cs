@@ -24,6 +24,7 @@ builder.Services.AddScoped<ICourseAdvisorService, CourseAdvisorService>();
 builder.Services.AddSingleton<ICVMLService, CVMLService>();
 builder.Services.AddScoped<ICVExtractorService, CVExtractorService>();
 builder.Services.AddScoped<ICVEvaluationService, CVEvaluationService>();
+builder.Services.AddScoped<StudyPlanService>();
 
 // ─── JWT Authentication ───────────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

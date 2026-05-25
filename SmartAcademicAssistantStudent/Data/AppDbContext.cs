@@ -16,6 +16,8 @@ namespace SmartAcademicAssistantStudent.Data
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
         public DbSet<CVEvaluation> CVEvaluations { get; set; }
+        public DbSet<StudyPlan> StudyPlans { get; set; }
+        public DbSet<StudyPlanCourse> StudyPlanCourses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -169,6 +171,35 @@ namespace SmartAcademicAssistantStudent.Data
 
                 // نفس المادة ما تتكرر كـ prerequisite
                 entity.HasIndex(cp => new { cp.CourseId, cp.RequiredCourseId }).IsUnique();
+            });
+            // ====== StudyPlan ======
+            modelBuilder.Entity<StudyPlan>(entity =>
+            {
+                entity.HasKey(sp => sp.Id);
+
+                entity.HasOne(sp => sp.Student)
+                      .WithMany()
+                      .HasForeignKey(sp => sp.StudentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ====== StudyPlanCourse ======
+            modelBuilder.Entity<StudyPlanCourse>(entity =>
+            {
+                entity.HasKey(spc => spc.Id);
+
+                entity.HasOne(spc => spc.StudyPlan)
+                      .WithMany(sp => sp.Courses)
+                      .HasForeignKey(spc => spc.StudyPlanId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(spc => spc.Course)
+                      .WithMany()
+                      .HasForeignKey(spc => spc.CourseId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // نفس المادة ما تتكرر في نفس الخطة
+                entity.HasIndex(spc => new { spc.StudyPlanId, spc.CourseId }).IsUnique();
             });
         }
     }

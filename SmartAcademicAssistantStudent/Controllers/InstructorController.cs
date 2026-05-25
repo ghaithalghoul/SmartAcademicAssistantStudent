@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartAcademicAssistantStudent.Data;
+using SmartAcademicAssistantStudent.Entities;
+using SmartAcademicAssistantStudent.Models;
 
 namespace SmartAcademicAssistantStudent.Controllers
 {
@@ -11,7 +13,6 @@ namespace SmartAcademicAssistantStudent.Controllers
     public class InstructorController(AppDbContext context) : ControllerBase
     {
         // ─── 1. كل الأساتذة ───────────────────────────────────────
-        // GET /api/instructor
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] string? department)
         {
@@ -40,7 +41,6 @@ namespace SmartAcademicAssistantStudent.Controllers
         }
 
         // ─── 2. تفاصيل أستاذ ──────────────────────────────────────
-        // GET /api/instructor/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -72,6 +72,79 @@ namespace SmartAcademicAssistantStudent.Controllers
                     }
                 })
             });
+        }
+
+        // ─── 3. إضافة أستاذ — Admin فقط ──────────────────────────
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Add([FromBody] AddInstructorDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Name) ||
+                string.IsNullOrWhiteSpace(request.Department))
+                return BadRequest("الاسم والقسم مطلوبان");
+
+            var instructor = new Instructor
+            {
+                Name = request.Name,
+                Department = request.Department
+            };
+
+            context.Instructors.Add(instructor);
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                instructor.Id,
+                instructor.Name,
+                instructor.Department
+            });
+        }
+
+        // ─── 4. تعديل أستاذ — Admin فقط ──────────────────────────
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(
+            int id, [FromBody] AddInstructorDto request)
+        {
+            var instructor = await context.Instructors.FindAsync(id);
+            if (instructor is null)
+                return NotFound("الأستاذ غير موجود");
+
+            if (!string.IsNullOrWhiteSpace(request.Name))
+                instructor.Name = request.Name;
+
+            if (!string.IsNullOrWhiteSpace(request.Department))
+                instructor.Department = request.Department;
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                instructor.Id,
+                instructor.Name,
+                instructor.Department
+            });
+        }
+
+        // ─── 5. حذف أستاذ — Admin فقط ────────────────────────────
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var instructor = await context.Instructors.FindAsync(id);
+            if (instructor is null)
+                return NotFound("الأستاذ غير موجود");
+
+            var hasSections = await context.CourseSections
+                .AnyAsync(s => s.InstructorId == id);
+
+            if (hasSections)
+                return BadRequest(
+                    "لا يمكن حذف الأستاذ لأن لديه شعب مرتبطة به");
+
+            context.Instructors.Remove(instructor);
+            await context.SaveChangesAsync();
+            return Ok("تم حذف الأستاذ بنجاح");
         }
     }
 }
